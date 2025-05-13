@@ -1,6 +1,6 @@
 ## Top Players by Theoretical and Gaming Performance by nationality, game type and gaming area.
 
-### Dashboard Link : https://app.powerbi.com/groups/me/reports/384d017e-e935-44dc-9e7d-1626c1a36de1/ReportSection
+### SQL script Link : 
 
 ### Project Overview
 This Project aims to provide insights into the gaming performnace of casino including top players by theoretical win, top players by actual win, top players by coin in, gaming performance by nationality (Philippines, USA and Others) and gaming performance by game type ang gaming area.
