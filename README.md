@@ -1,23 +1,5 @@
-## Top Players by Theoretical and Gaming Performance by nationality, game type and gaming area.
+## SQL Data Analytics Project
 
-### SQL script Link : 
+A set of SQL scripts for data exploration, analytics, and reporting. These scripts cover key areas such as database inspection, metric calculations, time-series trends, cumulative analysis, and segmentation. Designed for data analysts and BI professionals, this collection enables quick exploration and actionable insights within relational databases. Each query demonstrates best practices and focuses on a specific analytical theme for efficient and reliable analysis.
 
-### Project Overview
-This Project aims to provide insights into the gaming performnace of casino including top players by theoretical win, top players by actual win, top players by coin in, gaming performance by nationality (Philippines, USA and Others) and gaming performance by game type ang gaming area.
 
-### Data Sources
-The datasets used for this projects are GamingAreaTable.csv, NationalityTable.csv, PlayerSessionTable.csv and PlayerTable.csv.
-
-### Tools
-- Excel - Data Cleaning
-- SQL Server - Data transformation and Data analysis
-
-### Data Cleaning and preparation
-
-1. Data formatting, handling of missing values and changing of data types was peformed in excel before loading to sql server
-2. New columns were created in SQl server using conditional statements to answer business questions.
-
-### Results / Findings
-1. Was able to identify top players who contributed to casino's revenue
-2. Approximately 17% of the players are from the Philippines, while 13% are from the USA.
-3. Approximately 54% of the players played table games, while 42% played slots games.
