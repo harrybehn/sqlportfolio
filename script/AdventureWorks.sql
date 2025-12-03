@@ -272,11 +272,10 @@ Data Segmentation Analysis
 ===============================================================================
 Purpose:
     - To group data into meaningful categories for targeted insights.
-    - For customer segmentation, product categorization, or regional analysis.
 ===============================================================================
-
 Segment products into price ranges and 
 count how many products fall into each segment*/
+    
 WITH ProductionSegmaentation ps AS(
 SELECT
     ProductID AS product_id, Name AS product_name, ListPrice AS price,
@@ -291,6 +290,7 @@ SELECT price_range, COUNT(product_id) AS product_qty
 FROM ps
 GROUP BY price_category
 ORDER BY COUNT(product_id) DESC
+
 
 
 
