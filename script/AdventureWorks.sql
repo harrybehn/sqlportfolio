@@ -168,7 +168,60 @@ SELECT
     SUM(LineTotal) AS total_sales,
     COUNT(DISTINCT CustomerID) AS total_customers,
     SUM(OrderQty) AS total_orderquantity
+FROM sod2
 GROUP BY YEAR(OrderDate), MONTH(OrderDate)
 ORDER BY YEAR(OrderDate), MONTH(OrderDate)
 
+--Alternative is to use:
+    
+--1.DATETRUNC() - output is Date
+SELECT
+    DATETRUNC(month, OrderDate) AS order_date,
+    SUM(LineTotal) AS total_sales,
+    COUNT(DISTINCT CustomerID) AS total_customers,
+    SUM(OrderQty) AS total_orderquantity
+GROUP BY DATETRUNC(month, OrderDate)
+ORDER BY DATETRUNC(month, OrderDate)
+--2.FORMAT() - output is String
+SELECT
+    FORMAT(OrderDate, 'yyyy-MMM') AS order_date,
+    SUM(LineTotal) AS total_sales,
+    COUNT(DISTINCT CustomerID) AS total_customers,
+    SUM(OrderQty) AS total_orderquantity
+GROUP BY FORMAT(OrderDate, 'yyyy-MMM')
+ORDER BY FORMAT(OrderDate, 'yyyy-MMM')
+
+/*
+Cumulative Analysis
+===============================================================================
+Purpose:
+    - To calculate running totals or moving averages for key metrics.
+    - To track performance over time cumulatively.
+    - Useful for growth analysis or identifying long-term trends.
+
+SQL Functions Used:
+    - Window Functions: SUM() OVER(), AVG() OVER()
+===============================================================================
+*/
+-- Calculate the total sales per month 
+-- and the running total of sales over time 
+WITH SalesOrderDetail2 sod2 AS(
+    SELECT soh.OrderDate, sod.LineTotal, sod.UnitPrice
+    FROM Sales.SalesOrderDetail sod
+    LEFT JOIN Sales.SalesOrderHeader soh
+    ON sod.SalesOrderID = soh.SalesOrderID
+), Monthly m AS(
+SELECT
+    DATETRUNC(month ,OrderDate) AS order_date,
+    SUM(LineTotal) AS total_sales
+    AVG(UnitPrice) AS avg_price
+FROM sod2
+GROUP BY DATETRUNC(month ,OrderDate)
+ORDER BY DATETRUNC(month ,OrderDate)
+)
+SELECT order_date,
+       total_sales,
+       SUM(total_sales) OVER (ORDER BY order_date) AS running_total_sales,
+       AVG(avg_price) OVER (ORDER BY order_date) AS moving_average_price
+FROM m
 
