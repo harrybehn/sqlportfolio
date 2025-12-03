@@ -141,21 +141,15 @@ LEFT JOIN Sales.Store AS st
 GROUP BY p.FirstName, p.LastName, st.Name
 ORDER BY total_sales DESC;
 
-/*
-Change Over Time Analysis
+/* Change Over Time Analysis
 ===============================================================================
-Purpose:
-    - To track trends, growth, and changes in key metrics over time.
-    - For time-series analysis and identifying seasonality.
-    - To measure growth or decline over specific periods.
-
 SQL Functions Used:
     - Date Functions: DATEPART(), DATETRUNC(), FORMAT()
     - Aggregate Functions: SUM(), COUNT(), AVG()
-===============================================================================
-*/
+===============================================================================*/
 -- Analyse sales performance over time
 -- Quick Date Functions
+
 WITH SalesOrderDetail2 sod2 AS(
     SELECT soh.OrderDate, sod.OrderQty, sod.LineTotal, sod.CustomerID
     FROM Sales.SalesOrderDetail sod
@@ -191,13 +185,7 @@ SELECT
 GROUP BY FORMAT(OrderDate, 'yyyy-MMM')
 ORDER BY FORMAT(OrderDate, 'yyyy-MMM')
 
-/*
-Cumulative Analysis
-===============================================================================
-Purpose:
-    - To calculate running totals or moving averages for key metrics.
-    - To track performance over time cumulatively.
-    - Useful for growth analysis or identifying long-term trends.
+/*Cumulative Analysis
 
 SQL Functions Used:
     - Window Functions: SUM() OVER(), AVG() OVER()
@@ -205,6 +193,7 @@ SQL Functions Used:
 */
 -- Calculate the total sales per month 
 -- and the running total of sales over time 
+    
 WITH SalesOrderDetail2 sod2 AS(
     SELECT soh.OrderDate, sod.LineTotal, sod.UnitPrice
     FROM Sales.SalesOrderDetail sod
@@ -224,4 +213,44 @@ SELECT order_date,
        SUM(total_sales) OVER (ORDER BY order_date) AS running_total_sales,
        AVG(avg_price) OVER (ORDER BY order_date) AS moving_average_price
 FROM m
+
+/*Performance Analysis (Year-over-Year, Month-over-Month)*/
+
+WITH SalesOrderDetail2 sod2 AS(
+    SELECT soh.OrderDate, sod.LineTotal, p.Name AS product_name
+    FROM Sales.SalesOrderDetail sod
+    LEFT JOIN Sales.SalesOrderHeader soh
+    ON sod.SalesOrderID = soh.SalesOrderID
+    LEFT JOIN ProductN.Product p
+    ON sod.ProductID = p.ProductID
+), YearlySales ys AS(
+SELECT
+    YEAR(OrderDate) AS order_year,
+    product_name,
+    SUM(LineTotal) AS total_sales
+FROM sod2
+GROUP BY YEAR(OrderDate), product_name
+), AverageSales avs AS(
+SELECT
+    order_year,
+    product_name,
+    total_sales,
+    AVG(total_sales) OVER (PARTITION BY product_name) AS avg_sales
+    LAG(total_sales) OVER (PARTITION BY product_name ORDER BY order_year) AS py_sales 
+FROM ys
+)
+SELECT 
+    order_year,
+    product_name,
+    total_sales,
+    CASE
+        WHEN total_sales - avg_sales > 0 THEN 'Above Avg'
+        WHEN total_sales - avg_sales < 0 THEN 'Below Avg' ELSE 'Avg'
+    END AS vs_Avg,
+
+    CASE
+        WHEN total_sales - py_sales > 0 THEN 'Increased'
+        WHEN total_sales - py_sales < 0 THEN 'Decreased' ELSE 'No change'
+    END AS vs_py
+FROM avs
 
