@@ -214,23 +214,34 @@ SELECT order_date,
        AVG(avg_price) OVER (ORDER BY order_date) AS moving_average_price
 FROM m
 
-/*Performance Analysis (Year-over-Year, Month-over-Month)*/
-
+/*Performance Analysis (Year-over-Year, Month-over-Month)
+===============================================================================
+ SQL Functions Used:
+    - LAG(): Accesses data from previous rows.
+    - AVG() OVER(): Computes average values within partitions.
+    - CASE: Defines conditional logic for trend analysis.   
+=============================================================================== 
+Analyze the yearly performance of products by comparing their sales 
+to both the average sales performance of the product and the previous year's sales */
+    
+-- JOIN Sales.SalesOrderDetail, Sales.SalesOrderHeader & ProductN.Product to get add OrderDate & Product name to SalesOrderDetails table
 WITH SalesOrderDetail2 sod2 AS(
     SELECT soh.OrderDate, sod.LineTotal, p.Name AS product_name
     FROM Sales.SalesOrderDetail sod
     LEFT JOIN Sales.SalesOrderHeader soh
     ON sod.SalesOrderID = soh.SalesOrderID
-    LEFT JOIN ProductN.Product p
+    LEFT JOIN Productn.Product p
     ON sod.ProductID = p.ProductID
 ), YearlySales ys AS(
-SELECT
+-- Aggregate for Yearly Sales 
+SELECT 
     YEAR(OrderDate) AS order_year,
     product_name,
     SUM(LineTotal) AS total_sales
 FROM sod2
 GROUP BY YEAR(OrderDate), product_name
 ), AverageSales avs AS(
+-- Get the Average sales and previous sales using window function AVG() OVER() & LAG()
 SELECT
     order_year,
     product_name,
@@ -239,6 +250,7 @@ SELECT
     LAG(total_sales) OVER (PARTITION BY product_name ORDER BY order_year) AS py_sales 
 FROM ys
 )
+-- compare the total sales vs the average sales and previous sales
 SELECT 
     order_year,
     product_name,
@@ -253,4 +265,32 @@ SELECT
         WHEN total_sales - py_sales < 0 THEN 'Decreased' ELSE 'No change'
     END AS vs_py
 FROM avs
+ORDER BY product_name
+
+/*
+Data Segmentation Analysis
+===============================================================================
+Purpose:
+    - To group data into meaningful categories for targeted insights.
+    - For customer segmentation, product categorization, or regional analysis.
+===============================================================================
+
+Segment products into price ranges and 
+count how many products fall into each segment*/
+WITH ProductionSegmaentation ps AS(
+SELECT
+    ProductID AS product_id, Name AS product_name, ListPrice AS price,
+    CASE
+        WHEN price > 3000 THEN 'Above 3000'
+        WHEN price >= 2000 THEN '2000 to 3000' 
+        WHEN price >= 1000 THEN '1000 to 2000' ELSE 'Below 1000'
+    END AS price_range
+FROM Productn.Product 
+)
+SELECT price_range, COUNT(product_id) AS product_qty
+FROM ps
+GROUP BY price_category
+ORDER BY COUNT(product_id) DESC
+
+
 
