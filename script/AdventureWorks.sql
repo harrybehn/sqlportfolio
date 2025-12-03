@@ -141,3 +141,34 @@ LEFT JOIN Sales.Store AS st
 GROUP BY p.FirstName, p.LastName, st.Name
 ORDER BY total_sales DESC;
 
+/*
+Change Over Time Analysis
+===============================================================================
+Purpose:
+    - To track trends, growth, and changes in key metrics over time.
+    - For time-series analysis and identifying seasonality.
+    - To measure growth or decline over specific periods.
+
+SQL Functions Used:
+    - Date Functions: DATEPART(), DATETRUNC(), FORMAT()
+    - Aggregate Functions: SUM(), COUNT(), AVG()
+===============================================================================
+*/
+-- Analyse sales performance over time
+-- Quick Date Functions
+WITH SalesOrderDetail2 sod2 AS(
+    SELECT soh.OrderDate, sod.OrderQty, sod.LineTotal, sod.CustomerID
+    FROM Sales.SalesOrderDetail sod
+    LEFT JOIN Sales.SalesOrderHeader soh
+    ON sod.SalesOrderID = soh.SalesOrderID
+)
+SELECT
+    YEAR(OrderDate) AS order_year,
+    MONTH(OrderDate) AS order_month,
+    SUM(LineTotal) AS total_sales,
+    COUNT(DISTINCT CustomerID) AS total_customers,
+    SUM(OrderQty) AS total_orderquantity
+GROUP BY YEAR(OrderDate), MONTH(OrderDate)
+ORDER BY YEAR(OrderDate), MONTH(OrderDate)
+
+
