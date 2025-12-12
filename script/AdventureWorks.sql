@@ -150,8 +150,8 @@ SQL Functions Used:
 -- Analyse sales performance over time
 -- Quick Date Functions
 
-WITH SalesOrderDetail2 sod2 AS(
-    SELECT soh.OrderDate, sod.OrderQty, sod.LineTotal, sod.CustomerID
+WITH sod2 AS(
+    SELECT soh.OrderDate, sod.OrderQty, sod.LineTotal, soh.CustomerID
     FROM Sales.SalesOrderDetail sod
     LEFT JOIN Sales.SalesOrderHeader soh
     ON sod.SalesOrderID = soh.SalesOrderID
@@ -290,6 +290,7 @@ SELECT price_range, COUNT(product_id) AS product_qty
 FROM ps
 GROUP BY price_category
 ORDER BY COUNT(product_id) DESC
+
 
 
 
