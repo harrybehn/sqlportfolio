@@ -194,25 +194,32 @@ SQL Functions Used:
 -- Calculate the total sales per month 
 -- and the running total of sales over time 
     
-WITH sod2 AS(
-    SELECT soh.OrderDate, sod.LineTotal, sod.UnitPrice
-    FROM Sales.SalesOrderDetail sod
-    LEFT JOIN Sales.SalesOrderHeader soh
-    ON sod.SalesOrderID = soh.SalesOrderID
-), Monthly m AS(
-SELECT
-    DATETRUNC(month ,OrderDate) AS order_date,
-    SUM(LineTotal) AS total_sales
-    AVG(UnitPrice) AS avg_price
-FROM sod2
-GROUP BY DATETRUNC(month ,OrderDate)
-ORDER BY DATETRUNC(month ,OrderDate)
+WITH sod2 AS (
+    SELECT
+        soh.OrderDate,
+        sod.LineTotal,
+        sod.UnitPrice
+    FROM Sales.SalesOrderDetail AS sod
+    INNER JOIN Sales.SalesOrderHeader AS soh
+        ON sod.SalesOrderID = soh.SalesOrderID
+),
+m AS (
+    SELECT
+        DATETRUNC(month, soh.OrderDate) AS order_date,
+        SUM(sod.LineTotal) AS total_sales,
+        AVG(sod.UnitPrice) AS avg_price
+    FROM Sales.SalesOrderDetail AS sod
+    INNER JOIN Sales.SalesOrderHeader AS soh
+        ON sod.SalesOrderID = soh.SalesOrderID
+    GROUP BY DATETRUNC(month, soh.OrderDate)
 )
-SELECT order_date,
-       total_sales,
-       SUM(total_sales) OVER (ORDER BY order_date) AS running_total_sales,
-       AVG(avg_price) OVER (ORDER BY order_date) AS moving_average_price
+SELECT
+    order_date,
+    total_sales,
+    SUM(total_sales) OVER (ORDER BY order_date) AS running_total_sales,
+    AVG(avg_price)  OVER (ORDER BY order_date) AS cumulative_avg_price
 FROM m
+ORDER BY order_date;
 
 /*Performance Analysis (Year-over-Year, Month-over-Month)
 ===============================================================================
@@ -290,6 +297,7 @@ SELECT price_range, COUNT(product_id) AS product_qty
 FROM ps
 GROUP BY price_category
 ORDER BY COUNT(product_id) DESC
+
 
 
 
