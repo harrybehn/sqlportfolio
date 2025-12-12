@@ -193,7 +193,7 @@ SQL Functions Used:
 */
 -- Calculate the total sales per month 
 -- and the running total of sales over time 
-    
+
 WITH sod2 AS (
     SELECT
         soh.OrderDate,
@@ -205,13 +205,11 @@ WITH sod2 AS (
 ),
 m AS (
     SELECT
-        DATETRUNC(month, soh.OrderDate) AS order_date,
-        SUM(sod.LineTotal) AS total_sales,
-        AVG(sod.UnitPrice) AS avg_price
-    FROM Sales.SalesOrderDetail AS sod
-    INNER JOIN Sales.SalesOrderHeader AS soh
-        ON sod.SalesOrderID = soh.SalesOrderID
-    GROUP BY DATETRUNC(month, soh.OrderDate)
+        DATETRUNC(month, OrderDate) AS order_date,
+        SUM(LineTotal) AS total_sales,
+        AVG(UnitPrice) AS avg_price
+    FROM sod2
+    GROUP BY DATETRUNC(month, OrderDate)
 )
 SELECT
     order_date,
@@ -297,6 +295,7 @@ SELECT price_range, COUNT(product_id) AS product_qty
 FROM ps
 GROUP BY price_category
 ORDER BY COUNT(product_id) DESC
+
 
 
 
