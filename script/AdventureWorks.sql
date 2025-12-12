@@ -194,7 +194,7 @@ SQL Functions Used:
 -- Calculate the total sales per month 
 -- and the running total of sales over time 
     
-WITH SalesOrderDetail2 sod2 AS(
+WITH sod2 AS(
     SELECT soh.OrderDate, sod.LineTotal, sod.UnitPrice
     FROM Sales.SalesOrderDetail sod
     LEFT JOIN Sales.SalesOrderHeader soh
@@ -225,7 +225,7 @@ Analyze the yearly performance of products by comparing their sales
 to both the average sales performance of the product and the previous year's sales */
     
 -- JOIN Sales.SalesOrderDetail, Sales.SalesOrderHeader & ProductN.Product to get add OrderDate & Product name to SalesOrderDetails table
-WITH SalesOrderDetail2 sod2 AS(
+WITH sod2 AS(
     SELECT soh.OrderDate, sod.LineTotal, p.Name AS product_name
     FROM Sales.SalesOrderDetail sod
     LEFT JOIN Sales.SalesOrderHeader soh
@@ -276,7 +276,7 @@ Purpose:
 Segment products into price ranges and 
 count how many products fall into each segment*/
     
-WITH ProductionSegmaentation ps AS(
+WITH ps AS(
 SELECT
     ProductID AS product_id, Name AS product_name, ListPrice AS price,
     CASE
@@ -290,6 +290,7 @@ SELECT price_range, COUNT(product_id) AS product_qty
 FROM ps
 GROUP BY price_category
 ORDER BY COUNT(product_id) DESC
+
 
 
 
